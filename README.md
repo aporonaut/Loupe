@@ -1,5 +1,7 @@
 # Loupe
 
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE) [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue?logo=python&logoColor=white)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/PyTorch-CUDA%2012.8-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/) [![Ruff](https://img.shields.io/badge/code%20style-ruff-d7ff64?logo=ruff&logoColor=black)](https://docs.astral.sh/ruff/) [![Pyright](https://img.shields.io/badge/type%20check-pyright-797952?logo=python&logoColor=white)](https://microsoft.github.io/pyright/) [![uv](https://img.shields.io/badge/package-uv-de5fe9?logo=uv&logoColor=white)](https://docs.astral.sh/uv/)
+
 Aesthetic analysis for anime screenshots. Loupe scores frames across six independent dimensions -- composition, color, detail, lighting, subject, and style -- producing structured data that lets you sort hundreds of screenshots and review them top-down instead of eyeballing every frame.
 
 The human remains the curator. Loupe surfaces the multi-dimensional profile of each image so you can make faster, more informed keep/discard decisions.

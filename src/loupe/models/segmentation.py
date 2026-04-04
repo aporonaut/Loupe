@@ -1,4 +1,4 @@
-# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# Copyright 2026 Aaron AlAnsari (Aporonaut)
 # SPDX-License-Identifier: Apache-2.0
 
 """Anime segmentation model — character/background mask via ISNet-IS.
