@@ -9,5 +9,15 @@ wheels/
 # Virtual environments
 .venv
 
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+
 # Claude Workspace
 .claude/
+
+# Loupe sidecar output
+.loupe/
+
+# Integration test images
+tests/integration/

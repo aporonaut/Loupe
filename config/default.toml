@@ -1,0 +1,51 @@
+# Loupe default configuration
+
+[scoring]
+preset = "balanced"
+
+# Relative weights per dimension (normalized internally).
+# These are the "balanced" preset defaults — all dimensions equal.
+[scoring.weights]
+composition = 1.0
+color = 1.0
+detail = 1.0
+lighting = 1.0
+subject = 1.0
+style = 0.5
+
+# Per-analyzer configuration
+[analyzers.composition]
+enabled = true
+confidence_threshold = 0.25
+
+[analyzers.color]
+enabled = true
+confidence_threshold = 0.25
+
+[analyzers.color.params]
+n_clusters = 6
+
+[analyzers.detail]
+enabled = true
+confidence_threshold = 0.25
+
+[analyzers.detail.params]
+bg_weight = 0.6
+char_weight = 0.4
+
+[analyzers.lighting]
+enabled = true
+confidence_threshold = 0.25
+
+[analyzers.subject]
+enabled = true
+confidence_threshold = 0.25
+
+[analyzers.style]
+enabled = true
+confidence_threshold = 0.25
+
+[analyzers.style.params]
+tagger_threshold = 0.35
+aesthetic_weight = 0.70
+layer_consistency_weight = 0.30
