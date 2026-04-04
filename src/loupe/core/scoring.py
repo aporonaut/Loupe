@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Aggregate scoring — weighted arithmetic mean with contribution tracking."""
 
 from __future__ import annotations

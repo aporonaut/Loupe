@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Composition analyzer — spatial arrangement analysis.
 
 Measures the structural design of visual elements within an anime frame

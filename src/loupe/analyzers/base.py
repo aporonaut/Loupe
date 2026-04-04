@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Analyzer protocol — interface all analyzers implement."""
 
 from __future__ import annotations

@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Style analyzer — artistic identity analysis.
 
 Measures artistic identity through two scored sub-properties and

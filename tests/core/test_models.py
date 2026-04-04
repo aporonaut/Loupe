@@ -96,7 +96,7 @@ class TestLoupeResult:
             aggregate_score=0.0,
         )
         assert result.schema_version == "1.0"
-        assert result.loupe_version == "0.1.0"
+        assert result.loupe_version == "1.0.0"
 
     def test_json_roundtrip(self) -> None:
         original = LoupeResult(

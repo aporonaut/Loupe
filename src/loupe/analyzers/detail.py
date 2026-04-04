@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Detail analyzer — visual complexity analysis.
 
 Measures the rendering effort and visual complexity of an anime frame

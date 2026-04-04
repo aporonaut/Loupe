@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Color analyzer — palette design analysis.
 
 Measures chromatic properties across seven sub-properties: Matsuda harmony

@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Generic ONNX model loading utilities.
 
 Provides thin wrappers around onnxruntime for session creation with

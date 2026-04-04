@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Anime aesthetic scorer — quality estimation via deepghs SwinV2.
 
 Uses the deepghs/anime_aesthetic ONNX model to classify anime images

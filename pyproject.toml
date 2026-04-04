@@ -1,8 +1,9 @@
 [project]
 name = "loupe"
-version = "0.1.0"
+version = "1.0.0"
 description = "Modular aesthetic analysis tool for anime screenshots"
 readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">=3.13"
 dependencies = [
     "torch>=2.6.0",
@@ -15,9 +16,7 @@ dependencies = [
     "scikit-image>=0.24",
     "pillow>=11.0",
     "pydantic>=2.8",
-    "pydantic-settings>=2.13",
     "typer>=0.15",
-    "typer-config>=1.5",
     "rich>=13.0",
     "timm>=1.0.20",
     "huggingface-hub",
@@ -120,6 +119,7 @@ reportMissingTypeStubs = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not integration and not gpu and not slow'"
 markers = [
     "gpu: marks tests requiring CUDA GPU",
     "slow: marks tests that are slow to run",

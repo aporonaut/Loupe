@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """WD-Tagger v3 — Danbooru-style tag prediction via SwinV2.
 
 Uses the SmilingWolf/wd-swinv2-tagger-v3 model (via timm) to predict

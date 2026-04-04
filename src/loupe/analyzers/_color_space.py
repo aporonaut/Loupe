@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """OkLab/OkLCh color space conversion utilities.
 
 Provides sRGB → linear RGB → OkLab → OkLCh conversions operating on

@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Sidecar I/O — .loupe/ directory management, JSON read/write."""
 
 from __future__ import annotations

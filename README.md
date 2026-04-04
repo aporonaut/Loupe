@@ -1,97 +1,187 @@
 # Loupe
 
-Modular aesthetic analysis tool for anime screenshots. Loupe measures frames across six independent aesthetic dimensions — composition, color, detail, lighting, subject, and style — producing structured per-dimension scores and tags. The human remains the curator; Loupe provides the structured data to accelerate a review pass across large screenshot collections.
+Aesthetic analysis for anime screenshots. Loupe scores frames across six independent dimensions -- composition, color, detail, lighting, subject, and style -- producing structured data that lets you sort hundreds of screenshots and review them top-down instead of eyeballing every frame.
+
+The human remains the curator. Loupe surfaces the multi-dimensional profile of each image so you can make faster, more informed keep/discard decisions.
+
+<!-- TODO: SVG/asciinema terminal recording of single-image analysis -->
+
+## Quick Example
+
+```bash
+loupe analyze screenshot.png
+```
+
+```text
+screenshot.png
+
+ Dimension     Score  Tags
+ composition   0.723  rule_of_thirds, balanced, strong_leading_lines
+ color         0.681  harmonic_V, cool_palette, diverse_palette
+ detail        0.594  rich_background, sharp_rendering
+ lighting      0.712  dramatic_lighting, rim_lit, directional_light
+ subject       0.638  medium_shot, strong_separation, complete_subject
+ style         0.485  aesthetic_great, digital_modern_anime
+
+ Aggregate: 0.649  (balanced)
+```
+
+<!-- TODO: Replace fenced code block with SVG terminal recording -->
+
+Results are written as JSON sidecar files alongside the images:
+
+```text
+screenshots/
+├── image.png
+└── .loupe/
+    └── image.png.json
+```
+
+Each sidecar contains the full analysis -- per-dimension scores, tags with confidence values, sub-property breakdowns, and aggregate scoring metadata:
+
+```json
+{
+  "image_path": "screenshot.png",
+  "image_metadata": { "width": 1920, "height": 1080, "format": "png" },
+  "analyzer_results": [
+    {
+      "analyzer": "composition",
+      "score": 0.723,
+      "tags": [
+        { "name": "rule_of_thirds", "confidence": 0.81, "category": "composition" },
+        { "name": "balanced", "confidence": 0.74, "category": "composition" }
+      ],
+      "metadata": { "sub_scores": { "rule_of_thirds": 0.81, "visual_balance": 0.74, "..." : "..." } }
+    }
+  ],
+  "aggregate_score": 0.649,
+  "scoring": {
+    "method": "weighted_mean",
+    "weights": { "composition": 0.182, "color": 0.182, "..." : "..." },
+    "contributions": { "composition": 0.131, "color": 0.124, "..." : "..." },
+    "reliable": true
+  },
+  "schema_version": "1.0"
+}
+```
+
+Delete `.loupe/` to cleanly remove all Loupe artifacts. Images are never modified.
 
 ## Installation
 
 Requires Python 3.13+ and a CUDA-capable GPU (recommended).
 
 ```bash
-# Clone and install
-git clone <repo-url> && cd loupe
+git clone https://github.com/aporonaut/Loupe.git && cd Loupe
 uv sync
 
 # Download models (~2 GB, one-time)
 uv run loupe setup
 ```
 
-For development (linting, type checking, tests):
-
-```bash
-uv sync --extra dev
-```
-
 Loupe uses PyTorch with CUDA 12.8. The `uv sync` command handles PyTorch index routing automatically via `pyproject.toml`.
 
-### cuDNN note (Windows)
+<details>
+<summary>cuDNN note (Windows)</summary>
 
-ONNX Runtime needs cuDNN 9.x for GPU acceleration. Loupe automatically finds the cuDNN bundled with PyTorch — no separate install needed. If you see CUDA fallback warnings, your PyTorch installation may be missing CUDA support.
+ONNX Runtime needs cuDNN 9.x for GPU acceleration. Loupe automatically finds the cuDNN bundled with PyTorch -- no separate install needed. If you see CUDA fallback warnings, your PyTorch installation may be missing CUDA support.
 
-## Quickstart
+</details>
+
+## Usage
+
+| Command | Purpose |
+| --- | --- |
+| `loupe analyze <path>` | Score images across six aesthetic dimensions |
+| `loupe rank <path>` | List images sorted by aggregate score |
+| `loupe report <path>` | Batch summary statistics and correlations |
+| `loupe tags` | List all tags Loupe can produce |
+| `loupe setup` | Download required models (~2 GB, one-time) |
+
+### Common workflows
 
 ```bash
-# Analyze a single image
-uv run loupe analyze screenshot.png
+# Analyze a directory, then rank the results
+loupe analyze screenshots/ && loupe rank screenshots/
 
-# Analyze a directory
-uv run loupe analyze screenshots/
+# Re-rank with a composition-focused preset (no re-analysis needed)
+loupe rank screenshots/ --preset composition
 
-# View rankings
-uv run loupe rank screenshots/
+# Prefix filenames with rank numbers for easy review in a file browser
+loupe rank screenshots/ --rename
 
-# Batch summary statistics
-uv run loupe report screenshots/
+# Re-analyze everything, ignoring existing sidecars
+loupe analyze screenshots/ --force
 
-# Prefix filenames with rank numbers for easier review
-uv run loupe rank screenshots/ --rename
-
-# Re-rank with a different preset
-uv run loupe rank screenshots/ --preset composition
-
-# List all tags Loupe can produce
-uv run loupe tags
+# Show all tags per dimension (not just top 3)
+loupe analyze screenshot.png --verbose
 ```
 
-### Output
+## How Scoring Works
 
-Analysis results are written as JSON sidecar files in a `.loupe/` directory alongside the images:
+Each analyzer produces an independent 0.0--1.0 score. The aggregate score is a Weighted Arithmetic Mean of these per-dimension scores -- dimensions with higher weights contribute more to the final number. See [Scoring Reference](docs/scoring.md) for the full formula, JSON output fields, and custom weight configuration.
 
-```text
-screenshots/
-├── image.png
-├── .loupe/
-│   └── image.png.json    # Full analysis result
-```
+### Presets
 
-Delete `.loupe/` to cleanly remove all Loupe artifacts. Images are never modified.
+Presets control the relative weight of each dimension:
+
+| Preset | Composition | Color | Detail | Lighting | Subject | Style |
+| --- | --- | --- | --- | --- | --- | --- |
+| `balanced` | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 0.5 |
+| `composition` | 3.0 | 1.0 | 1.0 | 1.0 | 1.0 | 0.5 |
+| `visual` | 1.0 | 2.0 | 2.0 | 1.0 | 1.0 | 0.5 |
+
+Style is weighted at 0.5 by default because the aesthetic scorer provides limited discriminative signal for intra-anime quality comparison.
 
 ## Analyzers
 
-Each analyzer measures one aesthetic dimension, producing a score (0.0-1.0) and contextual tags.
+Each analyzer measures one aesthetic dimension, producing a score and contextual tags. See [Analyzer Reference](docs/analyzers.md) for full methodology, all tags, and scoring interpretation.
 
 ### Composition
 
-Spatial arrangement — rule of thirds, visual balance, symmetry, leading lines, diagonal dominance, negative space, depth layering, framing. All classical CV (OpenCV + NumPy), no model dependencies.
+Evaluates spatial arrangement using classical computer vision (OpenCV + NumPy). Measures rule of thirds placement, visual balance, symmetry, leading lines, diagonal structure, negative space, depth layering, and framing. No model dependencies.
+
+High scores indicate strong compositional structure with clear subject placement and visual flow. Low scores suggest cluttered or center-heavy framing.
+
+Example tags: `rule_of_thirds`, `balanced`, `diagonal_composition`, `open_composition`
 
 ### Color
 
-Palette design — Matsuda harmony scoring across 8 templates, palette extraction via K-means in OkLab color space, saturation balance, color contrast, temperature consistency, diversity, colorfulness. Fully classical.
+Analyzes palette design via Matsuda harmony scoring across 8 template types, palette extraction using K-means in OkLab color space, colorfulness, saturation balance, color contrast, temperature consistency, and diversity. Fully classical.
+
+High scores indicate harmonious, intentional palettes. Low scores suggest muddy or clashing color usage.
+
+Example tags: `harmonic_V`, `warm_palette`, `vivid`, `diverse_palette`
 
 ### Detail
 
-Visual complexity — edge density, spatial frequency, texture richness (GLCM), shading granularity, line work quality, rendering clarity. Region-separated analysis (character vs background) using anime segmentation.
+Measures visual complexity through edge density, spatial frequency, texture richness (GLCM), shading granularity, line work quality, and rendering clarity. Analysis is region-separated (character vs background) using the shared segmentation model, with configurable region weights (default 60% background, 40% character).
+
+High scores indicate rich textures, fine line work, and sophisticated shading. Low scores indicate flat or simple rendering.
+
+Example tags: `high_detail`, `rich_background`, `sharp_rendering`, `complex_shading`
 
 ### Lighting
 
-Illumination design — contrast ratio, light directionality, rim/edge lighting, shadow quality, atmospheric effects, highlight/shadow balance. Supplemented with WD-Tagger lighting tags.
+Evaluates illumination design through contrast ratio, light directionality, rim/edge lighting, shadow quality, atmospheric bloom effects, and tonal balance. Classical CV on the V (value) channel, supplemented with WD-Tagger predictions for lighting-specific labels.
+
+High scores indicate dramatic, intentional illumination design. Low scores suggest flat or uncontrolled lighting.
+
+Example tags: `dramatic_lighting`, `rim_lit`, `atmospheric`, `directional_light`
 
 ### Subject
 
-Focal emphasis — saliency strength, figure-ground separation, depth-of-field detection, negative space utilization, subject completeness, subject scale. Requires anime segmentation and character detection models.
+Assesses focal emphasis via saliency concentration, figure-ground separation (OkLab color difference), depth-of-field detection, negative space utilization, subject completeness, and subject scale. Requires the shared segmentation and detection models to identify subjects. Scores floor at 0.1 for environment shots (no character detected).
+
+High scores indicate strong focal emphasis with clear figure-ground separation. Low scores suggest unclear subject or landscape composition.
+
+Example tags: `medium_shot`, `strong_separation`, `shallow_dof`, `complete_subject`
 
 ### Style
 
-Artistic identity — aesthetic quality score (anime aesthetic scorer), layer consistency (experimental). Categorical tags from WD-Tagger (art style tags) and CLIP zero-shot classification (style categories). Aesthetic tier labels (masterpiece through worst).
+Measures artistic identity through aesthetic quality (deepghs anime aesthetic scorer, ONNX) and experimental layer consistency (classical CV). Categorical tags from WD-Tagger (art style) and CLIP ViT-L/14 (zero-shot style classification) do not affect the score. This is the least mature analyzer -- style scores have very low variance (~0.02 std).
+
+Example tags: `aesthetic_great`, `digital_modern_anime`, `cel_shading`, `consistent_rendering`
 
 ## Configuration
 
@@ -100,18 +190,6 @@ Loupe uses layered TOML configuration:
 1. **Defaults**: `config/default.toml`
 2. **User config**: `~/.config/loupe/config.toml` (or `--config` flag)
 3. **CLI overrides**: `--preset`, `--force`, etc.
-
-### Scoring presets
-
-Presets control the relative weight of each dimension in the aggregate score:
-
-| Preset        | Composition | Color | Detail | Lighting | Subject | Style |
-| ------------- | ----------- | ----- | ------ | -------- | ------- | ----- |
-| `balanced`    | 1.0         | 1.0   | 1.0    | 1.0      | 1.0     | 0.5   |
-| `composition` | 3.0         | 1.0   | 1.0    | 1.0      | 1.0     | 0.5   |
-| `visual`      | 1.0         | 2.0   | 2.0    | 1.0      | 1.0     | 0.5   |
-
-Style is weighted at 0.5 by default because the aesthetic scorer provides limited discriminative signal for intra-anime quality comparison.
 
 ### Per-analyzer configuration
 
@@ -128,19 +206,14 @@ n_clusters = 6  # K-means palette clusters
 [analyzers.detail.params]
 bg_weight = 0.6    # Background region weight
 char_weight = 0.4  # Character region weight
-
-[analyzers.style.params]
-tagger_threshold = 0.35       # WD-Tagger confidence threshold
-aesthetic_weight = 0.70        # Aesthetic scorer contribution
-layer_consistency_weight = 0.30  # Layer consistency contribution
 ```
 
 ## Models
 
-Loupe uses several pretrained models for analysis. All are downloaded via `loupe setup` and cached locally — analysis runs fully offline after setup.
+All models are downloaded once via `loupe setup` and cached locally. Analysis runs fully offline after setup.
 
 | Model | Purpose | Used by |
-| ----- | ------- | ------- |
+| --- | --- | --- |
 | [anime-segmentation](https://github.com/SkyTNT/anime-segmentation) (ONNX) | Character mask | Detail, Lighting, Subject, Style |
 | [WD-Tagger v3](https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3) (SwinV2) | Tag prediction | Style, Lighting |
 | [deepghs detection](https://huggingface.co/deepghs) (ONNX) | Face/head/person boxes | Subject |
@@ -157,17 +230,20 @@ On an RTX 3070 with CUDA, typical throughput is ~1.4 seconds per image (~170 ima
 - Classical CV (color K-means, composition, detail): ~40%
 - Scoring/I/O: negligible
 
-## Known limitations
+## Known Limitations
 
-- **Style dimension has low variance** (std ~0.02 across diverse images) — the aesthetic scorer provides limited discriminative power for intra-anime comparison. Style is downweighted to 0.5 in the default preset.
-- **Subject floors at 0.1 for environment shots** — when the segmentation model finds no character, subject scores `environment_focus` at 0.1. This is by design but penalizes intentional environment/object-focused compositions.
-- **Segmentation fails on non-standard art styles** — painterly, watercolor, or heavily stylized frames may not have characters detected even when figures are visible.
-- **Scores are not comparable across art styles** — a Kyoto Animation frame and a Madhouse frame have fundamentally different visual profiles. Rankings are most meaningful within a single title or similar style.
-- **Loupe measures visual properties, not narrative significance** — a dramatically important scene with poor composition will score low. The human review pass accounts for this.
+- **Style dimension has low variance** (std ~0.02 across diverse images) -- the aesthetic scorer provides limited discriminative power for intra-anime comparison. Style is downweighted to 0.5 in the default preset.
+- **Subject floors at 0.1 for environment shots** -- when the segmentation model finds no character, subject scores 0.1 with `environment_focus`. This is by design but penalizes intentional environment/object-focused compositions.
+- **Segmentation fails on non-standard art styles** -- painterly, watercolor, or heavily stylized frames may not have characters detected even when figures are visible.
+- **Scores are not comparable across art styles** -- a Kyoto Animation frame and a Madhouse frame have fundamentally different visual profiles. Rankings are most meaningful within a single title or similar style.
+- **Loupe measures visual properties, not narrative significance** -- a dramatically important scene with poor composition will score low. The human review pass accounts for this.
 
 ## Development
 
 ```bash
+# Install dev dependencies
+uv sync --extra dev
+
 # Format
 ruff format .
 
@@ -180,13 +256,13 @@ uv run pyright src/
 # Run tests
 uv run pytest
 
+# Run all verification steps
+just verify
+
 # Run benchmarks
 uv run pytest tests/test_benchmarks.py --benchmark-only
-
-# Build
-uv build
 ```
 
 ## License
 
-TBD
+Licensed under the [Apache License 2.0](LICENSE).

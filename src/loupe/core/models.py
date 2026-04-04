@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Pydantic data models — Tag, AnalyzerResult, ScoringMetadata, LoupeResult."""
 
 from datetime import datetime

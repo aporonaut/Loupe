@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """CLIP model — image embeddings and zero-shot classification via OpenCLIP.
 
 Uses ViT-L/14 (OpenAI pretrained) via the open_clip library for image

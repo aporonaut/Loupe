@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Configuration system — TOML-based layered config with scoring presets."""
 
 from __future__ import annotations

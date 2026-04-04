@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Model manager — loads and manages shared ML models for the analysis engine.
 
 The ModelManager determines which models to load based on which analyzers

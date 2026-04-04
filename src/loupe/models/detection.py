@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Anime detection models — face, head, and person detection via YOLOv8.
 
 Uses deepghs ONNX models for detecting anime faces, heads, and persons.

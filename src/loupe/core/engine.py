@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Analysis engine — orchestrates analyzer dispatch and result aggregation."""
 
 from __future__ import annotations

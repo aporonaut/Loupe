@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Subject analyzer — focal emphasis analysis.
 
 Measures how effectively a frame emphasizes its subject(s) across six

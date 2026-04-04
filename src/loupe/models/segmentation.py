@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Anime segmentation model — character/background mask via ISNet-IS.
 
 Uses the skytnt/anime-seg ONNX model (ISNet-IS architecture) to produce

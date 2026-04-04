@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Image loading — format detection, metadata extraction, array conversion."""
 
 from __future__ import annotations

@@ -1,3 +1,6 @@
+# Copyright 2025 Aaron AlAnsari (Aporonaut)
+# SPDX-License-Identifier: Apache-2.0
+
 """Lighting analyzer — illumination design analysis.
 
 Measures the quality and design of illumination in an anime frame across
