@@ -1,0 +1,253 @@
+direction: down
+
+input: {
+  label: Image
+  shape: page
+  style: {
+    fill: "#dbeafe"
+    stroke: "#3b82f6"
+    font-size: 22
+  }
+}
+
+loader: {
+  label: ImageLoader
+  style: {
+    fill: "#f5f5f5"
+    stroke: "#9ca3af"
+    font-size: 22
+  }
+}
+
+engine: {
+  label: Engine
+  label.near: top-center
+  style: {
+    fill: "#fafafa"
+    stroke: "#6b7280"
+    stroke-width: 2
+    font-size: 24
+    bold: true
+  }
+
+  shared: {
+    label: Shared Model Inference
+    label.near: top-center
+    style: {
+      fill: "#f0fdf4"
+      stroke: "#22c55e"
+      border-radius: 8
+      font-size: 20
+      bold: true
+    }
+
+    seg: {
+      label: "Anime\nSegmentation"
+      shape: hexagon
+      style: {
+        fill: "#dcfce7"
+        stroke: "#16a34a"
+        font-size: 18
+      }
+    }
+
+    tagger: {
+      label: "WD-Tagger\nv3"
+      shape: hexagon
+      style: {
+        fill: "#dcfce7"
+        stroke: "#16a34a"
+        font-size: 18
+      }
+    }
+
+    detect: {
+      label: "Character\nDetection"
+      shape: hexagon
+      style: {
+        fill: "#dcfce7"
+        stroke: "#16a34a"
+        font-size: 18
+      }
+    }
+
+    aesthetic: {
+      label: "Aesthetic\nScorer"
+      shape: hexagon
+      style: {
+        fill: "#dcfce7"
+        stroke: "#16a34a"
+        font-size: 18
+      }
+    }
+
+    clip: {
+      label: "CLIP\nViT-L/14"
+      shape: hexagon
+      style: {
+        fill: "#dcfce7"
+        stroke: "#16a34a"
+        font-size: 18
+      }
+    }
+  }
+
+  cache: {
+    label: "Cached Outputs\n(per image)"
+    shape: cylinder
+    style: {
+      fill: "#fef3c7"
+      stroke: "#d97706"
+      font-size: 18
+    }
+  }
+
+  shared -> cache: {
+    label: "run once"
+    style: {
+      stroke: "#d97706"
+      font-size: 18
+    }
+  }
+
+  analyzers: {
+    label: Analyzers
+    label.near: top-center
+    style: {
+      fill: "#faf5ff"
+      stroke: "#a855f7"
+      border-radius: 8
+      font-size: 20
+      bold: true
+    }
+
+    composition: {
+      label: "Composition"
+      style: {
+        fill: "#f3e8ff"
+        stroke: "#9333ea"
+        font-size: 18
+      }
+    }
+
+    color: {
+      label: "Color"
+      style: {
+        fill: "#f3e8ff"
+        stroke: "#9333ea"
+        font-size: 18
+      }
+    }
+
+    detail: {
+      label: "Detail"
+      style: {
+        fill: "#f3e8ff"
+        stroke: "#9333ea"
+        font-size: 18
+      }
+    }
+
+    lighting: {
+      label: "Lighting"
+      style: {
+        fill: "#f3e8ff"
+        stroke: "#9333ea"
+        font-size: 18
+      }
+    }
+
+    subject_: {
+      label: "Subject"
+      style: {
+        fill: "#f3e8ff"
+        stroke: "#9333ea"
+        font-size: 18
+      }
+    }
+
+    style_: {
+      label: "Style"
+      style: {
+        fill: "#f3e8ff"
+        stroke: "#9333ea"
+        font-size: 18
+      }
+    }
+  }
+
+  cache -> analyzers: {
+    label: "image + shared outputs"
+    style: {
+      stroke: "#d97706"
+      font-size: 18
+    }
+  }
+}
+
+scoring: {
+  label: "Scoring\n(Weighted Arithmetic Mean)"
+  shape: diamond
+  style: {
+    fill: "#f5f5f5"
+    stroke: "#6b7280"
+    font-size: 20
+  }
+}
+
+result: {
+  label: LoupeResult
+  shape: package
+  style: {
+    fill: "#fef3c7"
+    stroke: "#d97706"
+    stroke-width: 2
+    font-size: 22
+  }
+}
+
+output: {
+  label: ".loupe/image.json"
+  shape: page
+  style: {
+    fill: "#fef9c3"
+    stroke: "#ca8a04"
+    font-size: 22
+  }
+}
+
+input -> loader: {
+  style.stroke: "#9ca3af"
+}
+
+loader -> engine: {
+  label: "RGB array + metadata"
+  style: {
+    stroke: "#9ca3af"
+    font-size: 18
+  }
+}
+
+engine -> scoring: {
+  label: "AnalyzerResults"
+  style: {
+    stroke: "#9333ea"
+    font-size: 18
+  }
+}
+
+scoring -> result: {
+  label: "aggregate + contributions"
+  style: {
+    stroke: "#6b7280"
+    font-size: 18
+  }
+}
+
+result -> output: {
+  label: "serialize"
+  style: {
+    stroke: "#d97706"
+    font-size: 18
+  }
+}

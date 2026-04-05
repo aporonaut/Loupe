@@ -1,12 +1,12 @@
-# Loupe
+<!-- markdownlint-disable MD041 -->
+
+![Loupe](assets/loupe-banner-1280512.png)
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE) [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue?logo=python&logoColor=white)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/PyTorch-CUDA%2012.8-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/) [![Ruff](https://img.shields.io/badge/code%20style-ruff-d7ff64?logo=ruff&logoColor=black)](https://docs.astral.sh/ruff/) [![Pyright](https://img.shields.io/badge/type%20check-pyright-797952?logo=python&logoColor=white)](https://microsoft.github.io/pyright/) [![uv](https://img.shields.io/badge/package-uv-de5fe9?logo=uv&logoColor=white)](https://docs.astral.sh/uv/)
 
 Aesthetic analysis for anime screenshots. Loupe scores frames across six independent dimensions -- composition, color, detail, lighting, subject, and style -- producing structured data that lets you sort hundreds of screenshots and review them top-down instead of eyeballing every frame.
 
 The human remains the curator. Loupe surfaces the multi-dimensional profile of each image so you can make faster, more informed keep/discard decisions.
-
-<!-- TODO: SVG/asciinema terminal recording of single-image analysis -->
 
 ## Quick Example
 
@@ -18,17 +18,19 @@ loupe analyze screenshot.png
 screenshot.png
 
  Dimension     Score  Tags
- composition   0.723  rule_of_thirds, balanced, strong_leading_lines
- color         0.681  harmonic_V, cool_palette, diverse_palette
- detail        0.594  rich_background, sharp_rendering
- lighting      0.712  dramatic_lighting, rim_lit, directional_light
- subject       0.638  medium_shot, strong_separation, complete_subject
- style         0.485  aesthetic_great, digital_modern_anime
+ color         0.701  harmonic_L, cool_palette, diverse_palette
+ composition   0.620  centered, balanced, symmetric, diagonal_composition, open_composition
+ detail        0.708  high_detail, rich_background, detailed_character, sharp_rendering,
+                      complex_shading, fine_line_work
+ lighting      0.722  dramatic_lighting, high_contrast, soft_shadows, atmospheric,
+                      balanced_exposure, directional_light
+ subject       0.781  closeup, strong_separation, shallow_dof, complete_subject
+ style         0.529  naturalistic_anime
 
- Aggregate: 0.649  (balanced)
+ Aggregate: 0.690  (balanced)
 ```
 
-<!-- TODO: Replace fenced code block with SVG terminal recording -->
+![Loupe single-image analysis](assets/demo-analyze.gif)
 
 Results are written as JSON sidecar files alongside the images:
 
@@ -67,7 +69,7 @@ Each sidecar contains the full analysis -- per-dimension scores, tags with confi
 }
 ```
 
-Delete `.loupe/` to cleanly remove all Loupe artifacts. Images are never modified.
+Delete `.loupe/` to cleanly remove all Loupe artifacts. Image contents are never modified (`--rename` prefixes filenames only).
 
 ## Installation
 
@@ -97,6 +99,7 @@ ONNX Runtime needs cuDNN 9.x for GPU acceleration. Loupe automatically finds the
 | `loupe analyze <path>` | Score images across six aesthetic dimensions |
 | `loupe rank <path>` | List images sorted by aggregate score |
 | `loupe report <path>` | Batch summary statistics and correlations |
+| `loupe clean <path>` | Strip Loupe prefixes and remove `.loupe/` data |
 | `loupe tags` | List all tags Loupe can produce |
 | `loupe setup` | Download required models (~2 GB, one-time) |
 
@@ -109,8 +112,14 @@ loupe analyze screenshots/ && loupe rank screenshots/
 # Re-rank with a composition-focused preset (no re-analysis needed)
 loupe rank screenshots/ --preset composition
 
-# Prefix filenames with rank numbers for easy review in a file browser
+# Prefix filenames with Loupe scores for easy sorting in a file browser
 loupe rank screenshots/ --rename
+
+# Use rank-based prefix instead (L001-, L002-, ...)
+loupe rank screenshots/ --rename --rename-style rank
+
+# After review: strip prefixes and remove analysis data
+loupe clean screenshots/
 
 # Re-analyze everything, ignoring existing sidecars
 loupe analyze screenshots/ --force
@@ -118,6 +127,12 @@ loupe analyze screenshots/ --force
 # Show all tags per dimension (not just top 3)
 loupe analyze screenshot.png --verbose
 ```
+
+![Loupe batch analysis and ranking](assets/demo-rank.gif)
+
+## Architecture
+
+![Loupe analysis pipeline](assets/architecture.png)
 
 ## How Scoring Works
 
@@ -268,3 +283,9 @@ uv run pytest tests/test_benchmarks.py --benchmark-only
 ## License
 
 Licensed under the [Apache License 2.0](LICENSE).
+
+---
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/1cefab81-5270-4220-a074-7575f9e8656c" alt="AlAnsari" />
+</div>
