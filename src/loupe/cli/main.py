@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import re
 import statistics
 from pathlib import Path  # noqa: TC003 — Typer needs Path at runtime
 from typing import Annotated
@@ -236,9 +237,16 @@ def rank(
         bool,
         typer.Option(
             "--rename",
-            help="Prefix filenames with rank number (e.g. 001_image.png).",
+            help="Prefix filenames with Loupe tag (see --rename-style).",
         ),
     ] = False,
+    rename_style: Annotated[
+        str,
+        typer.Option(
+            "--rename-style",
+            help="Prefix style: 'score' (L0673) or 'rank' (L001).",
+        ),
+    ] = "score",
 ) -> None:
     """List images sorted by aggregate score."""
     images = _collect_images(path)
@@ -284,7 +292,6 @@ def rank(
     table.add_column("Top Dimensions", style="cyan")
     table.add_column("Profile", style="dim")
 
-    pad = len(str(len(scored)))
     for i, (img_path, score, top_dims, profile) in enumerate(scored, 1):
         if score >= 0.7:
             score_str = f"[green]{score:.3f}[/green]"
@@ -299,26 +306,40 @@ def rank(
     console.print(table)
 
     if rename:
-        _rename_with_rank(scored, pad)
+        _rename_with_prefix(scored, rename_style)
 
 
-def _rename_with_rank(
+_PREFIX_RE = re.compile(r"^(L\d+-|\d+_)")
+
+
+def _rename_with_prefix(
     scored: list[tuple[Path, float, list[str], str]],
-    pad: int,
+    style: str,
 ) -> None:
-    """Prefix filenames with zero-padded rank numbers.
+    """Prefix filenames with a Loupe tag indicating score or rank.
 
-    Strips any existing rank prefix (digits followed by underscore)
-    before applying the new one so the command is idempotent.
+    Parameters
+    ----------
+    scored
+        Images sorted by aggregate score (descending).
+    style
+        ``"score"`` for score-based prefix (``L0673-``) or
+        ``"rank"`` for rank-based prefix (``L001-``).
+
+    Strips any existing Loupe prefix (``L<digits>-``) or legacy rank
+    prefix (``<digits>_``) before applying the new one so the command
+    is idempotent across styles.
     """
-    import re
-
+    pad = len(str(len(scored)))
     renamed = 0
-    for i, (img_path, _score, _dims, _profile) in enumerate(scored, 1):
+    for rank, (img_path, score, _dims, _profile) in enumerate(scored, 1):
         name = img_path.name
-        # Strip existing rank prefix like "001_"
-        stripped = re.sub(r"^\d+_", "", name)
-        new_name = f"{i:0{pad}d}_{stripped}"
+        stripped = _PREFIX_RE.sub("", name)
+        if style == "rank":
+            new_name = f"L{rank:0{pad}d}-{stripped}"
+        else:
+            score_int = min(9999, max(0, round(score * 1000)))
+            new_name = f"L{score_int:04d}-{stripped}"
         if new_name == name:
             continue
         new_path = img_path.parent / new_name
@@ -329,7 +350,7 @@ def _rename_with_rank(
             sidecar.rename(sidecar.parent / f"{new_name}.json")
         renamed += 1
 
-    console.print(f"[green]Renamed {renamed} file(s) with rank prefix.[/green]")
+    console.print(f"[green]Renamed {renamed} file(s) with {style} prefix.[/green]")
 
 
 @app.command()
@@ -538,6 +559,48 @@ _TAG_REFERENCE: dict[str, list[tuple[str, str]]] = {
         ("retro_cel_anime", "CLIP: retro cel animation style"),
     ],
 }
+
+
+@app.command()
+def clean(
+    path: Annotated[Path, typer.Argument(help="Directory to clean.")],
+) -> None:
+    """Strip Loupe prefixes from filenames and remove analysis data.
+
+    Restores original filenames by removing ``L``-prefixes added by
+    ``loupe rank --rename``, then deletes the ``.loupe/`` sidecar
+    directory.  Intended for use after the review pass is complete.
+    """
+    import shutil
+
+    images = _collect_images(path)
+    if not images:
+        console.print(f"[red]No images found at: {path}[/red]")
+        raise typer.Exit(1)
+
+    cleaned = 0
+    for img_path in images:
+        name = img_path.name
+        stripped = _PREFIX_RE.sub("", name)
+        if stripped != name:
+            img_path.rename(img_path.parent / stripped)
+            cleaned += 1
+
+    loupe_dir = path / ".loupe"
+    removed_data = False
+    if loupe_dir.is_dir():
+        shutil.rmtree(loupe_dir)
+        removed_data = True
+
+    parts: list[str] = []
+    if cleaned:
+        parts.append(f"stripped prefixes from {cleaned} file(s)")
+    if removed_data:
+        parts.append("removed .loupe/ data")
+    if parts:
+        console.print(f"[green]Cleaned: {', '.join(parts)}.[/green]")
+    else:
+        console.print("[yellow]Nothing to clean.[/yellow]")
 
 
 @app.command()

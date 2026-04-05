@@ -981,7 +981,8 @@ Modules delivered:
 
 - `src/loupe/cli/main.py` — Full CLI overhaul:
   - `analyze`: single-image shows per-dimension breakdown; batch shows count + score range; `-v` adds top/bottom 3 ranked images. Progress bar with ETA starts after model loading. Logging scoped to `loupe.*` namespace only.
-  - `rank`: Rich table with rank, filename, score (color-coded), top 2 dimensions, profile tag. `--rename` prefixes filenames with zero-padded rank numbers (idempotent). `--preset` re-ranks with different weights. `--limit` for top-N.
+  - `rank`: Rich table with rank, filename, score (color-coded), top 2 dimensions, profile tag. `--rename` prefixes filenames with Loupe tag (`L0673-` score or `L001-` rank, selectable via `--rename-style`; idempotent across styles). `--preset` re-ranks with different weights. `--limit` for top-N.
+  - `clean`: Strips Loupe prefixes from filenames and removes `.loupe/` sidecar directory. Post-review cleanup command.
   - `report`: per-dimension statistics (min/median/mean/max/stdev) + Pearson correlation matrix between dimensions.
   - `tags`: full reference of all 76+ tags across 6 dimensions with descriptions.
   - `setup`: model download with error handling.
