@@ -10,7 +10,7 @@ Each enabled analyzer produces an independent score `s_i` in [0.0, 1.0]. The agg
 aggregate = sum(w_i * s_i) / sum(w_i)
 ```
 
-Where `w_i` is the weight assigned to dimension `i`. Weights are normalized internally, so only their relative proportions matter -- weights of `[1, 1, 2]` and `[0.5, 0.5, 1]` produce identical results.
+Where `w_i` is the weight assigned to dimension `i`. Weights are normalized internally, so only their relative proportions matter; weights of `[1, 1, 2]` and `[0.5, 0.5, 1]` produce identical results.
 
 If an analyzer is disabled or its weight is zero, it is excluded from both the numerator and denominator. This means the aggregate score adjusts proportionally rather than penalizing missing dimensions.
 
@@ -103,8 +103,8 @@ The aggregate score equals the sum of all `contributions` values.
 
 ## Score calibration
 
-Analyzer scores are on an absolute 0.0--1.0 scale, not relative to other images. A score of 0.7 in composition means the same thing whether you've analyzed 10 images or 10,000. This means:
+Analyzer scores are on an absolute 0.0 to 1.0 scale, not relative to other images. A score of 0.7 in composition means the same thing whether you've analyzed 10 images or 10,000. This means:
 
-- Scores are comparable within a batch -- higher is better for ranking.
-- Scores across different shows or art styles may cluster differently. A high-detail show may have all detail scores in the 0.6--0.8 range, while a minimalist show clusters around 0.3--0.5. Both are valid.
+- Scores are comparable within a batch. Higher is better for ranking.
+- Scores across different shows or art styles may cluster differently. A high-detail show may have all detail scores in the 0.6 to 0.8 range, while a minimalist show clusters around 0.3 to 0.5. Both are valid.
 - The aggregate score is best used for **sort-and-review** within a session, not as an absolute quality judgment.

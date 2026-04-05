@@ -4,7 +4,7 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE) [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue?logo=python&logoColor=white)](https://www.python.org/) [![PyTorch](https://img.shields.io/badge/PyTorch-CUDA%2012.8-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/) [![Ruff](https://img.shields.io/badge/code%20style-ruff-d7ff64?logo=ruff&logoColor=black)](https://docs.astral.sh/ruff/) [![Pyright](https://img.shields.io/badge/type%20check-pyright-797952?logo=python&logoColor=white)](https://microsoft.github.io/pyright/) [![uv](https://img.shields.io/badge/package-uv-de5fe9?logo=uv&logoColor=white)](https://docs.astral.sh/uv/)
 
-Aesthetic analysis for anime screenshots. Loupe scores frames across six independent dimensions -- composition, color, detail, lighting, subject, and style -- producing structured data that lets you sort hundreds of screenshots and review them top-down instead of eyeballing every frame.
+Aesthetic analysis for anime screenshots. Loupe scores frames across six independent dimensions (composition, color, detail, lighting, subject, and style), producing structured data that lets you sort hundreds of screenshots and review them top-down instead of eyeballing every frame.
 
 The human remains the curator. Loupe surfaces the multi-dimensional profile of each image so you can make faster, more informed keep/discard decisions.
 
@@ -41,7 +41,7 @@ screenshots/
     └── image.png.json
 ```
 
-Each sidecar contains the full analysis -- per-dimension scores, tags with confidence values, sub-property breakdowns, and aggregate scoring metadata:
+Each sidecar contains the full analysis: per-dimension scores, tags with confidence values, sub-property breakdowns, and aggregate scoring metadata.
 
 ```json
 {
@@ -88,7 +88,7 @@ Loupe uses PyTorch with CUDA 12.8. The `uv sync` command handles PyTorch index r
 <details>
 <summary>cuDNN note (Windows)</summary>
 
-ONNX Runtime needs cuDNN 9.x for GPU acceleration. Loupe automatically finds the cuDNN bundled with PyTorch -- no separate install needed. If you see CUDA fallback warnings, your PyTorch installation may be missing CUDA support.
+ONNX Runtime needs cuDNN 9.x for GPU acceleration. Loupe automatically finds the cuDNN bundled with PyTorch, so no separate install is needed. If you see CUDA fallback warnings, your PyTorch installation may be missing CUDA support.
 
 </details>
 
@@ -136,7 +136,7 @@ loupe analyze screenshot.png --verbose
 
 ## How Scoring Works
 
-Each analyzer produces an independent 0.0--1.0 score. The aggregate score is a Weighted Arithmetic Mean of these per-dimension scores -- dimensions with higher weights contribute more to the final number. See [Scoring Reference](docs/scoring.md) for the full formula, JSON output fields, and custom weight configuration.
+Each analyzer produces an independent 0.0 to 1.0 score. The aggregate score is a Weighted Arithmetic Mean of these per-dimension scores, where dimensions with higher weights contribute more to the final number. See [Scoring Reference](docs/scoring.md) for the full formula, JSON output fields, and custom weight configuration.
 
 ### Presets
 
@@ -196,7 +196,7 @@ Example tags: `medium_shot`, `strong_separation`, `shallow_dof`, `complete_subje
 
 ### Style
 
-Measures artistic identity through aesthetic quality (deepghs anime aesthetic scorer, ONNX) and experimental layer consistency (classical CV). Categorical tags from WD-Tagger (art style) and CLIP ViT-L/14 (zero-shot style classification) do not affect the score. This is the least mature analyzer -- style scores have very low variance (~0.02 std).
+Measures artistic identity through aesthetic quality (deepghs anime aesthetic scorer, ONNX) and experimental layer consistency (classical CV). Categorical tags from WD-Tagger (art style) and CLIP ViT-L/14 (zero-shot style classification) do not affect the score. This is the least mature analyzer; style scores have very low variance (~0.02 std).
 
 Example tags: `aesthetic_great`, `digital_modern_anime`, `cel_shading`, `consistent_rendering`
 
@@ -249,11 +249,11 @@ On an RTX 3070 with CUDA, typical throughput is ~1.4 seconds per image (~170 ima
 
 ## Known Limitations
 
-- **Style dimension has low variance** (std ~0.02 across diverse images) -- the aesthetic scorer provides limited discriminative power for intra-anime comparison. Style is downweighted to 0.5 in the default preset.
-- **Subject floors at 0.1 for environment shots** -- when the segmentation model finds no character, subject scores 0.1 with `environment_focus`. This is by design but penalizes intentional environment/object-focused compositions.
-- **Segmentation fails on non-standard art styles** -- painterly, watercolor, or heavily stylized frames may not have characters detected even when figures are visible.
-- **Scores are not comparable across art styles** -- a Kyoto Animation frame and a Madhouse frame have fundamentally different visual profiles. Rankings are most meaningful within a single title or similar style.
-- **Loupe measures visual properties, not narrative significance** -- a dramatically important scene with poor composition will score low. The human review pass accounts for this.
+- **Style dimension has low variance** (std ~0.02 across diverse images). The aesthetic scorer provides limited discriminative power for intra-anime comparison, so style is downweighted to 0.5 in the default preset.
+- **Subject floors at 0.1 for environment shots.** When the segmentation model finds no character, subject scores 0.1 with `environment_focus`. This is by design but penalizes intentional environment/object-focused compositions.
+- **Segmentation fails on non-standard art styles.** Painterly, watercolor, or heavily stylized frames may not have characters detected even when figures are visible.
+- **Scores are not comparable across art styles.** A Kyoto Animation frame and a Madhouse frame have fundamentally different visual profiles. Rankings are most meaningful within a single title or similar style.
+- **Loupe measures visual properties, not narrative significance.** A dramatically important scene with poor composition will score low. The human review pass accounts for this.
 
 ## Development
 
